@@ -18,4 +18,20 @@ export class RecipesPage implements OnInit {
     });
   }
 
+  ionViewWillEnter() {
+    console.log('ion view will enter');
+  }
+
+  ionViewDidEnter() {
+    console.log('ion view did enter');
+  }
+
+  ionViewWillLeave() {
+    console.log('vion view will leave');
+  }
+
+  ionViewDidLeave() {
+    console.log('vion view did leave');
+  }
+
 }
