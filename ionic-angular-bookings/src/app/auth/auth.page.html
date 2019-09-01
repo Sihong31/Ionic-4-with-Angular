@@ -15,7 +15,7 @@
               <ion-label position="floating">E-Mail</ion-label>
               <ion-input 
                 type="email" 
-                ngModel 
+                [(ngModel)]="email" 
                 name="email" 
                 required
                 email
@@ -30,7 +30,7 @@
               <ion-label position="floating">Password</ion-label>
               <ion-input 
                 type="password" 
-                ngModel 
+                [(ngModel)]="password" 
                 name="password"
                 required
                 minlength="6"

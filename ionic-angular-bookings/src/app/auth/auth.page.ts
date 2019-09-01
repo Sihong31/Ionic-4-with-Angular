@@ -10,6 +10,8 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./auth.page.scss'],
 })
 export class AuthPage implements OnInit {
+  email = '';
+  password = '';
   isLogin = true;
   isLoading = false;
 
@@ -44,9 +46,7 @@ export class AuthPage implements OnInit {
     if (!form.valid) {
       return;
     }
-    const email = form.value.email;
-    const password = form.value.password;
-    console.log(email, password);
+    console.log(this.email, this.password);
 
     if (this.isLogin) {
       // send a request to login servers
