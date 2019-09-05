@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlacesService } from '../../places.service';
 import { Place } from '../../place.model';
-import { NavController, LoadingController } from '@ionic/angular';
+import { NavController, LoadingController, AlertController } from '@ionic/angular';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -14,6 +14,8 @@ import { Subscription } from 'rxjs';
 export class EditOfferPage implements OnInit, OnDestroy {
   form: FormGroup;
   offer: Place;
+  placeId: string;
+  isLoading = false;
   private placeSub: Subscription;
 
   constructor(
@@ -21,7 +23,8 @@ export class EditOfferPage implements OnInit, OnDestroy {
     private navCtrl: NavController,
     private placesService: PlacesService,
     private router: Router,
-    private loadingCtrl: LoadingController) { }
+    private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(paramMap => {
@@ -29,6 +32,8 @@ export class EditOfferPage implements OnInit, OnDestroy {
         this.navCtrl.navigateBack('/places/tabs/offers');
         return;
       }
+      this.placeId = paramMap.get('placeId');
+      this.isLoading = true;
       this.placeSub =  this.placesService.getPlace(paramMap.get('placeId')).subscribe(place => {
         this.offer = place;
         this.form = new FormGroup({
@@ -40,6 +45,17 @@ export class EditOfferPage implements OnInit, OnDestroy {
             updateOn: 'blur',
             validators: [Validators.required, Validators.maxLength(180)]
           })
+        });
+        this.isLoading = false;
+      }, error => {
+        this.alertCtrl.create({
+          header: 'An error occurred!',
+          message: 'Place could not be fetched try again later.',
+          buttons: [{text: 'Okay', handler: () => {
+            this.router.navigateByUrl('/places/tabs/offers');
+          }}]
+        }).then(alertEl => {
+          alertEl.present();
         });
       });
     });
