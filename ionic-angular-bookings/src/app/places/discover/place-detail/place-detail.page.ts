@@ -98,7 +98,7 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
       }
     }).then(modalEl => {
       modalEl.present();
-    })
+    });
   }
 
   openBookingModal(mode: 'select' | 'random') {
