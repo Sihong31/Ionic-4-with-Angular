@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from './auth.service';
+import { AuthService, AuthResponseData } from './auth.service';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { NgForm } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-auth',
@@ -30,7 +31,14 @@ export class AuthPage implements OnInit {
     })
     .then(loadingEl => {
       loadingEl.present();
-      this.authService.signup(email, password).subscribe(resData => {
+      let authObs: Observable<AuthResponseData>;
+      if (this.isLogin) {
+        authObs = this.authService.login(email, password);
+      } else {
+        authObs = this.authService.signup(email, password);
+      }
+      authObs.subscribe(resData => {
+        console.log(resData);
         this.isLoading = false;
         loadingEl.dismiss();
         this.router.navigateByUrl('/places/tabs/discover');
@@ -40,11 +48,14 @@ export class AuthPage implements OnInit {
         let message = 'Could not sign you up, please try again!';
         if (code === 'EMAIL_EXISTS') {
           message = 'This email address already exists!';
+        } else if ( code === 'EMAIL_NOT_FOUND') {
+          message = 'Email address was not found.';
+        } else if ( code === 'INVALID_PASSWORD') {
+          message = 'Password is not valid.';
         }
         this.showAlert(message);
       });
     });
-    this.authService.login();
   }
 
   onSwitchAuthMode() {

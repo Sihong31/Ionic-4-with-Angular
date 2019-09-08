@@ -122,30 +122,39 @@ export class PlacesService {
     location: PlaceLocation
   ) {
     let generatedId: string;
-
-    const newPlace = new Place(
-      Math.random().toString(),
-      title,
-      description,
-      'https://cdn.pixabay.com/photo/2017/06/19/15/47/drottningholm-palace-2419776_960_720.jpg',
-      price,
-      dateFrom,
-      dateTo,
-      this.authService.userId,
-      location
-      );
-    return this.http.post<{name: string}>('https://ionic-angular-9fe4c.firebaseio.com/offered-places.json', { ...newPlace, id: null })
-      .pipe(
-        switchMap(resData => {
-          generatedId = resData.name;
-          return this.places;
-        }),
-        take(1),
-        tap(places => {
-          newPlace.id = generatedId;
-          this._places.next(places.concat(newPlace));
-        })
-      );
+    let newPlace: Place;
+    return this.authService.userId.pipe(
+      take(1),
+      switchMap(userId => {
+        if (!userId) {
+          throw Error('No user found!');
+        }
+        newPlace = new Place(
+          Math.random().toString(),
+          title,
+          description,
+          'https://cdn.pixabay.com/photo/2017/06/19/15/47/drottningholm-palace-2419776_960_720.jpg',
+          price,
+          dateFrom,
+          dateTo,
+          userId,
+          location
+          );
+        return this.http.post<{name: string}>(
+          'https://ionic-angular-9fe4c.firebaseio.com/offered-places.json',
+          { ...newPlace, id: null }
+        );
+      }),
+      switchMap(resData => {
+        generatedId = resData.name;
+        return this.places;
+      }),
+      take(1),
+      tap(places => {
+        newPlace.id = generatedId;
+        this._places.next(places.concat(newPlace));
+      })
+    );
   }
 
   updatePlace(placeId: string, title: string, description: string) {
@@ -181,7 +190,7 @@ export class PlacesService {
       tap(resData => {
         this._places.next(updatedPlaces);
       })
-    )
+    );
   }
 
 }
